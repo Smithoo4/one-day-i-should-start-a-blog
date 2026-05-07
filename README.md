@@ -12,7 +12,7 @@ This repo is just a place to dump random notes, guides, experiments, and half-ba
 
 - Linux stuff
 - NixOS configs
-- Virtualization (Incus, KVM, etc.)
+- Virtualization
 - Homelab experiments
 - Whatever else I’m playing with at the time
 
