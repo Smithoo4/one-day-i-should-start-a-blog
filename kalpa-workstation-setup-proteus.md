@@ -333,6 +333,7 @@ repodump() {
 }
 EOF
 
+```bash
 source ~/.bashrc
 ```
 
@@ -372,7 +373,9 @@ This sets up a weekly systemd user timer that updates, upgrades, and cleans up H
 
 ```bash
 mkdir -p ~/.config/systemd/user
+```
 
+```bash
 cat > ~/.config/systemd/user/brew-upgrade.service <<'EOF'
 [Unit]
 Description=Update Homebrew and upgrade packages
@@ -385,7 +388,9 @@ ExecStart=/home/linuxbrew/.linuxbrew/bin/brew update
 ExecStart=/home/linuxbrew/.linuxbrew/bin/brew upgrade
 ExecStart=/home/linuxbrew/.linuxbrew/bin/brew cleanup
 EOF
+```
 
+```bash
 cat > ~/.config/systemd/user/brew-upgrade.timer <<'EOF'
 [Unit]
 Description=Weekly Homebrew upgrade
@@ -398,7 +403,9 @@ RandomizedDelaySec=1h
 [Install]
 WantedBy=timers.target
 EOF
+```
 
+```bash
 systemctl --user daemon-reload
 systemctl --user enable --now brew-upgrade.timer
 ```
