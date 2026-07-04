@@ -8,9 +8,26 @@ Kalpa is fundamentally different from Tumbleweed and traditional distros. The ro
 
 ---
 
+## Contents
+
+- [ ] [1. Backup Current Workstation](#1-backup-current-workstation)
+- [ ] [2. Install openSUSE Kalpa via Agama](#2-install-opensuse-kalpa-via-agama)
+- [ ] [3. Understanding Kalpa Software Sources](#3-understanding-kalpa-software-sources)
+- [ ] [4. First Boot and System Update](#4-first-boot-and-system-update)
+- [ ] [5. Install Chrome, OnlyOffice, and Nextcloud via Flatpak](#5-install-chrome-onlyoffice-and-nextcloud-via-flatpak)
+- [ ] [6. KDE Plasma Tweaks](#6-kde-plasma-tweaks)
+- [ ] [7. Install Host OS Packages](#7-install-host-os-packages)
+- [ ] [8. Restore Keys and Configure Shell Environment](#8-restore-keys-and-configure-shell-environment)
+- [ ] [9. Install Citrix Workspace App](#9-install-citrix-workspace-app)
+- [ ] [10. Install Linuxbrew](#10-install-linuxbrew)
+- [ ] [11. Configure Kate](#11-configure-kate)
+
+---
+
 ## 1. Backup Current Workstation
 
-> **Note on USB mount paths:** the path your USB drive lands on depends on the running distro:
+> [!NOTE]
+> The path your USB drive lands on depends on the running distro:
 > - openSUSE / Fedora / other systemd-mount distros: `/run/media/morgan/TRANSFERS/`
 > - Debian / Ubuntu and derivatives: `/media/morgan/TRANSFERS/`
 
@@ -30,9 +47,13 @@ cp -r ~/.config/sops /run/media/morgan/TRANSFERS/sops-backup
 
 Chrome syncs via your Google account, so just confirm sync is enabled before reinstalling.
 
+### 1d. Note Files Backup Using Nextcloud
+
+Files syncs via your Nextcloud, so just confirm sync is enabled before reinstalling.
+
 ---
 
-## 2. Install openSUSE Kalpa (via Agama)
+## 2. Install openSUSE Kalpa via Agama
 
 ### 2a. Create Bootable USB
 
@@ -82,7 +103,8 @@ sudo transactional-update dup                     # full system upgrade
 sudo reboot                                       # required to activate changes
 ```
 
-> **Important:** Multiple `transactional-update pkg install` calls before rebooting overwrite each other (each builds from the currently-active snapshot). Batch all your installs into a single call.
+> [!IMPORTANT]
+> Multiple `transactional-update pkg install` calls before rebooting overwrite each other (each builds from the currently-active snapshot). Batch all your installs into a single call.
 
 ### Linuxbrew (CLI tools not in the default repository)
 
@@ -94,7 +116,7 @@ Kalpa ships Distrobox pre-installed. It lets you run a full mutable Linux enviro
 
 ---
 
-## 4. First Boot — Update the System
+## 4. First Boot and System Update
 
 System updates on Kalpa happen automatically via `transactional-update.timer` (runs daily). To trigger one manually:
 
@@ -105,7 +127,9 @@ sudo reboot
 
 ---
 
-## 5. Install Google Chrome, OnlyOffice and Nextcloud (Flatpak)
+## 5. Install Chrome, OnlyOffice, and Nextcloud via Flatpak
+
+This replaces Firefox with Chrome and adds OnlyOffice and the Nextcloud desktop client, all from Flathub:
 
 ```bash
 flatpak uninstall org.mozilla.firefox
@@ -113,9 +137,7 @@ flatpak install flathub com.google.Chrome org.onlyoffice.desktopeditors com.next
 flatpak uninstall --unused
 ```
 
-- Sign in to Chrome to sync bookmarks and extensions.
-- Pin Google Chrome to the taskbar.
-- Launch Nextcloud from the application menu, enter server URL and credentials, set sync folder to `~/Nextcloud`.
+Sign in to Chrome once it opens so your bookmarks and extensions sync, then pin it to the taskbar. For Nextcloud, launch it from the application menu and step through the setup wizard: enter your server URL and credentials, and set the sync folder to `~/Nextcloud`.
 
 ---
 
@@ -125,11 +147,14 @@ flatpak uninstall --unused
 
 **System Settings → Quick Settings → Theme → Breeze Dark → Apply.**
 
-or
+<details>
+<summary>Or set it from the terminal</summary>
 
 ```bash
 lookandfeeltool -a org.kde.breezedark.desktop
 ```
+
+</details>
 
 ### 6b. Move Window Buttons to the Right
 
@@ -137,7 +162,8 @@ lookandfeeltool -a org.kde.breezedark.desktop
 
 The commands below put just the Menu button (`M`) on the left, and Minimize (`I`), Maximize (`A`), and Close (`X`) grouped on the right — dragging the same buttons into that arrangement in the GUI panel achieves the same result.
 
-or
+<details>
+<summary>Or set it from the terminal</summary>
 
 ```bash
 kwriteconfig6 --file kwinrc --group "org.kde.kdecoration2" --key "ButtonsOnLeft" "M"
@@ -147,13 +173,16 @@ kwriteconfig6 --file kwinrc --group "org.kde.kdecoration2" --key "ButtonsOnTopRi
 qdbus6 org.kde.KWin /KWin reconfigure
 ```
 
+</details>
+
 ### 6c. Set Digital Clock to Use Regional Defaults
 
 1. Right-click on the clock applet
 2. Select **Configure Digital Clock**
 3. Change **Time Display** to **Uses Regional Defaults**
 
-or
+<details>
+<summary>Or set it from the terminal</summary>
 
 ```bash
 qdbus6 org.kde.plasmashell /PlasmaShell evaluateScript '
@@ -167,15 +196,20 @@ qdbus6 org.kde.plasmashell /PlasmaShell evaluateScript '
 '
 ```
 
+</details>
+
 ### 6d. Enable Num Lock at Login
 
 **System Settings → Input Devices → Keyboard → Hardware tab** → set **NumLock on Plasma Startup** to **Turn On**.
 
-or
+<details>
+<summary>Or set it from the terminal</summary>
 
 ```bash
 kwriteconfig6 --file kcminputrc --group "Keyboard" --key "NumLock" 0
 ```
+
+</details>
 
 ---
 
@@ -322,7 +356,7 @@ sudo systemctl reboot
 
 ### 10a. Install/Setup Linuxbrew
 
-Installs Homebrew and wires it into Konsole shells only, so it doesn't pollute non-interactive/system scripts.
+This installs Homebrew and wires it into Konsole shells only, so it doesn't pollute non-interactive or system scripts.
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -334,7 +368,7 @@ echo 'if [ $(basename $(printf "%s" "$(ps -p $(ps -p $$ -o ppid=) -o cmd=)" | cu
 
 ### 10b. Setup Auto Updates
 
-Sets up a weekly systemd user timer that updates, upgrades, and cleans up Homebrew automatically.
+This sets up a weekly systemd user timer that updates, upgrades, and cleans up Homebrew automatically.
 
 ```bash
 mkdir -p ~/.config/systemd/user
@@ -371,7 +405,7 @@ systemctl --user enable --now brew-upgrade.timer
 
 ### 10c. Install Software
 
-Installs the language servers Kate will use in Section 11.
+This installs the language servers Kate will use in Section 11.
 
 ```bash
 brew install yaml-language-server bash-language-server vscode-langservers-extracted marksman
@@ -382,3 +416,21 @@ brew install yaml-language-server bash-language-server vscode-langservers-extrac
 ## 11. Configure Kate
 
 **To be done later.**
+
+---
+
+## Reference
+
+| Resource | Link |
+|---|---|
+|Kalpa Desktop | https://kalpadesktop.org/ |
+|Kalpa Documentation | https://kalpadesktop.org/documentation/ |
+|linuxbrew on Kalpa | https://kalpadesktop.org/documentation/brew/ |
+|Citrix Workspace app 2604 for Linux | https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html |
+|Arch Wiki nano | https://wiki.archlinux.org/title/Nano|
+|Plasma Tips | https://userbase.kde.org/Plasma/Tips|
+
+
+---
+
+**Version:** 1.3 | **Last Updated:** July 4, 2026
