@@ -86,7 +86,7 @@ sudo reboot                                       # required to activate changes
 
 ### Linuxbrew (CLI tools not in the default repository)
 
-Some CLI tools simply aren't packaged for openSUSE, don't fit the Flatpak sandbox model (e.g. language servers meant to be found on `$PATH` by an editor), and aren't worth burning a host OS snapshot on. Linuxbrew fills that gap: it installs into `/home/linuxbrew/.linuxbrew`, entirely outside the read-only root filesystem, so it never touches a transactional-update snapshot and can be updated independently on its own schedule. In this guide it's used specifically to install the language servers Kate needs for Markdown/YAML/Bash editing support (see Section 13).
+Some CLI tools simply aren't packaged for openSUSE, don't fit the Flatpak sandbox model (e.g. language servers meant to be found on `$PATH` by an editor), and aren't worth burning a host OS snapshot on. Linuxbrew fills that gap: it installs into `/home/linuxbrew/.linuxbrew`, entirely outside the read-only root filesystem, so it never touches a transactional-update snapshot and can be updated independently on its own schedule. In this guide it's used specifically to install the language servers Kate needs for Markdown/YAML/Bash editing support (see Section 10).
 
 ### Distrobox (for anything else)
 
@@ -105,7 +105,81 @@ sudo reboot
 
 ---
 
-## 5. Install Host OS Packages
+## 5. Install Google Chrome, OnlyOffice and Nextcloud (Flatpak)
+
+```bash
+flatpak uninstall org.mozilla.firefox
+flatpak install flathub com.google.Chrome org.onlyoffice.desktopeditors com.nextcloud.desktopclient.nextcloud
+flatpak uninstall --unused
+```
+
+- Sign in to Chrome to sync bookmarks and extensions.
+- Pin Google Chrome to the taskbar.
+- Launch Nextcloud from the application menu, enter server URL and credentials, set sync folder to `~/Nextcloud`.
+
+---
+
+## 6. KDE Plasma Tweaks
+
+### 6a. Set Desktop Theme to Breeze Dark
+
+**System Settings → Quick Settings → Theme → Breeze Dark → Apply.**
+
+or
+
+```bash
+lookandfeeltool -a org.kde.breezedark.desktop
+```
+
+### 6b. Move Window Buttons to the Right
+
+**System Settings → Global Theme → Window Decorations → Configure Title bar buttons**
+
+The commands below put just the Menu button (`M`) on the left, and Minimize (`I`), Maximize (`A`), and Close (`X`) grouped on the right — dragging the same buttons into that arrangement in the GUI panel achieves the same result.
+
+or
+
+```bash
+kwriteconfig6 --file kwinrc --group "org.kde.kdecoration2" --key "ButtonsOnLeft" "M"
+kwriteconfig6 --file kwinrc --group "org.kde.kdecoration2" --key "ButtonsOnRight" "IAX"
+kwriteconfig6 --file kwinrc --group "org.kde.kdecoration2" --key "ButtonsOnTopLeft" --delete
+kwriteconfig6 --file kwinrc --group "org.kde.kdecoration2" --key "ButtonsOnTopRight" --delete
+qdbus6 org.kde.KWin /KWin reconfigure
+```
+
+### 6c. Set Digital Clock to Use Regional Defaults
+
+1. Right-click on the clock applet
+2. Select **Configure Digital Clock**
+3. Change **Time Display** to **Uses Regional Defaults**
+
+or
+
+```bash
+qdbus6 org.kde.plasmashell /PlasmaShell evaluateScript '
+  panels().concat(desktops()).forEach(function(container) {
+    container.widgets("org.kde.plasma.digitalclock").forEach(function(w) {
+      w.currentConfigGroup = ["Appearance"];
+      w.writeConfig("use24hFormat", 1);
+      w.reloadConfig();
+    });
+  });
+'
+```
+
+### 6d. Enable Num Lock at Login
+
+**System Settings → Input Devices → Keyboard → Hardware tab** → set **NumLock on Plasma Startup** to **Turn On**.
+
+or
+
+```bash
+kwriteconfig6 --file kcminputrc --group "Keyboard" --key "NumLock" 0
+```
+
+---
+
+## 7. Install Host OS Packages
 
 The packages below cover four things: core CLI tools (git, age, sops, nano, micro), spell-check dictionaries and Markdown preview support for Kate, a few fonts missing from the base install, and everything needed to run local VMs (libvirt/QEMU/virt-manager).
 
@@ -149,9 +223,9 @@ sudo systemctl reboot
 
 ---
 
-## 6. Restore SSH Keys and SOPS Age Key
+## 8. Restore Keys and Configure Shell Environment
 
-### 6a. SSH Keys
+### 8a. Restore SSH Keys
 
 ```bash
 cp -r /run/media/morgan/TRANSFERS/ssh-backup ~/.ssh
@@ -162,7 +236,7 @@ chmod 644 ~/.ssh/known_hosts 2>/dev/null
 chmod 644 ~/.ssh/config 2>/dev/null
 ```
 
-### 6b. SOPS Age Key
+### 8b. Restore SOPS Age Key
 
 ```bash
 mkdir -p ~/.config/sops
@@ -170,9 +244,7 @@ cp -r /run/media/morgan/TRANSFERS/sops-backup/* ~/.config/sops/
 chmod 600 ~/.config/sops/age/keys.txt
 ```
 
----
-
-## 7. Configure Git
+### 8c. Configure Git
 
 ```bash
 git config --global user.name "Morgan Smith"
@@ -180,9 +252,7 @@ git config --global user.email "13087392+Smithoo4@users.noreply.github.com"
 git config --global init.defaultBranch main
 ```
 
----
-
-## 8. Configure Nano
+### 8d. Configure Nano
 
 ```bash
 cat > ~/.nanorc <<'EOF'
@@ -206,9 +276,7 @@ set matchbrackets "(<[{)>]}"
 EOF
 ```
 
----
-
-## 9. Configure Bashrc
+### 8e. Configure Bashrc
 
 ```bash
 cat >> ~/.bashrc <<'EOF'
@@ -236,85 +304,9 @@ source ~/.bashrc
 
 ---
 
-## 10. Install Google Chrome, OnlyOffice and Nextcloud (Flatpak)
+## 9. Install Citrix Workspace App
 
-```bash
-flatpak uninstall org.mozilla.firefox
-flatpak install flathub com.google.Chrome org.onlyoffice.desktopeditors com.nextcloud.desktopclient.nextcloud
-flatpak uninstall --unused
-```
-
-- Sign in to Chrome to sync bookmarks and extensions.
-- Pin Google Chrome to the taskbar.
-- Launch Nextcloud from the application menu, enter server URL and credentials, set sync folder to `~/Nextcloud`.
-
----
-
-## 11. KDE Plasma Tweaks
-
-### 11a. Set Desktop Theme to Breeze Dark
-
-**System Settings → Quick Settings → Theme → Breeze Dark → Apply.**
-
-or
-
-```bash
-lookandfeeltool -a org.kde.breezedark.desktop
-```
-
-### 11b. Move Window Buttons to the Right
-
-**System Settings → Global Theme → Window Decorations → Configure Title bar buttons**
-
-The commands below set a layout with just Minimize (`M`) on the left, and On All Desktops (`I`), Keep Above Others (`A`), and Close (`X`) on the right — dragging the same buttons into that arrangement in the GUI panel achieves the same result.
-
-or
-
-```bash
-kwriteconfig6 --file kwinrc --group "org.kde.kdecoration2" --key "ButtonsOnLeft" "M"
-kwriteconfig6 --file kwinrc --group "org.kde.kdecoration2" --key "ButtonsOnRight" "IAX"
-kwriteconfig6 --file kwinrc --group "org.kde.kdecoration2" --key "ButtonsOnTopLeft" --delete
-kwriteconfig6 --file kwinrc --group "org.kde.kdecoration2" --key "ButtonsOnTopRight" --delete
-qdbus6 org.kde.KWin /KWin reconfigure
-```
-
-### 11c. Set Digital Clock to Use Regional Defaults
-
-1. Right-click on the clock applet
-2. Select **Configure Digital Clock**
-3. Change **Time Display** to **Uses Regional Defaults**
-
-or
-
-```bash
-qdbus6 org.kde.plasmashell /PlasmaShell evaluateScript '
-  panels().concat(desktops()).forEach(function(container) {
-    container.widgets("org.kde.plasma.digitalclock").forEach(function(w) {
-      w.currentConfigGroup = ["Appearance"];
-      w.writeConfig("use24hFormat", 1);
-      w.reloadConfig();
-    });
-  });
-'
-```
-
-### 11d. Enable Num Lock at Login
-
-**System Settings → Input Devices → Keyboard → Hardware tab** → set **NumLock on Plasma Startup** to **Turn On**.
-
-or
-
-```bash
-kwriteconfig6 --file kcminputrc --group "Keyboard" --key "NumLock" 0
-```
-
----
-
-## 12. Install Citrix Workspace App
-
-1. Manually download the RPM from the [Citrix Workspace App for Linux download page](https://www.citrix.com/downloads/workspace-app/linux/) (a Citrix account is required).
-2. Save it as `~/Downloads/ICAClient-suse-gcc-8-<version>-0.x86_64.rpm`.
-3. Install it via `transactional-update` and reboot to activate the snapshot:
+Citrix Workspace App isn't packaged for openSUSE, so it has to be downloaded and installed manually: no login is required, just go to the [Citrix Workspace App for Linux download page](https://www.citrix.com/downloads/workspace-app/linux/), download the RPM, save it to `~/Downloads/` as `ICAClient-suse-gcc-8-<version>-0.x86_64.rpm`, then install it via `transactional-update` and reboot to activate the snapshot.
 
 ```bash
 sudo transactional-update -n pkg install ~/Downloads/ICAClient-suse-gcc-8-*.rpm
@@ -326,9 +318,11 @@ sudo systemctl reboot
 
 ---
 
-## 13. Install Linuxbrew
+## 10. Install Linuxbrew
 
-Installs Homebrew, wires it into Konsole shells only (so it doesn't pollute non-interactive/system scripts), sets up a weekly auto-update timer, and installs the language servers Kate will use in Section 14.
+### 10a. Install/Setup Linuxbrew
+
+Installs Homebrew and wires it into Konsole shells only, so it doesn't pollute non-interactive/system scripts.
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -336,7 +330,13 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 echo '' >> ~/.bashrc
 echo '# Homebrew: load shellenv only in Konsole sessions' >> ~/.bashrc
 echo 'if [ $(basename $(printf "%s" "$(ps -p $(ps -p $$ -o ppid=) -o cmd=)" | cut --delimiter " " --fields 1)) = konsole ] ; then '$'\n''eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'$'\n''fi'$'\n' >> ~/.bashrc
+```
 
+### 10b. Setup Auto Updates
+
+Sets up a weekly systemd user timer that updates, upgrades, and cleans up Homebrew automatically.
+
+```bash
 mkdir -p ~/.config/systemd/user
 
 cat > ~/.config/systemd/user/brew-upgrade.service <<'EOF'
@@ -367,12 +367,18 @@ EOF
 
 systemctl --user daemon-reload
 systemctl --user enable --now brew-upgrade.timer
+```
 
+### 10c. Install Software
+
+Installs the language servers Kate will use in Section 11.
+
+```bash
 brew install yaml-language-server bash-language-server vscode-langservers-extracted marksman
 ```
 
 ---
 
-## 14. Configure Kate
+## 11. Configure Kate
 
 **To be done later.**
