@@ -243,17 +243,25 @@ sudo transactional-update pkg install \
   virt-viewer
 ```
 
+> [!NOTE]
+> When installing fetchmsttfonts, if you encounter the following error:
+> `Abort, retry, ignore? [a/r/i] (a): Command exited with status 1.`
+> `r` in most cases will resolve it.
+
+Reboot so the new snapshot takes effect:
+
+```bash
+sudo systemctl reboot
+```
+
 Add your user to the `libvirt` group so you can create and manage VMs without needing `sudo` every time:
 
 ```bash
 sudo usermod -aG libvirt $USER
 ```
 
-Reboot so the new snapshot (and group membership) takes effect:
-
-```bash
-sudo systemctl reboot
-```
+> [!NOTE]
+> A reboot, or logging out and back in, is required for this to take effect.
 
 ---
 
@@ -332,6 +340,7 @@ repodump() {
         && echo "[OK] repo_dump.txt created"
 }
 EOF
+```
 
 ```bash
 source ~/.bashrc
@@ -361,10 +370,17 @@ This installs Homebrew and wires it into Konsole shells only, so it doesn't poll
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+```bash
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+```
+```bash
 echo '' >> ~/.bashrc
 echo '# Homebrew: load shellenv only in Konsole sessions' >> ~/.bashrc
 echo 'if [ $(basename $(printf "%s" "$(ps -p $(ps -p $$ -o ppid=) -o cmd=)" | cut --delimiter " " --fields 1)) = konsole ] ; then '$'\n''eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'$'\n''fi'$'\n' >> ~/.bashrc
+```
+```bash
+source ~/.bashrc
 ```
 
 ### 10b. Setup Auto Updates
@@ -430,14 +446,13 @@ brew install yaml-language-server bash-language-server vscode-langservers-extrac
 
 | Resource | Link |
 |---|---|
-|Kalpa Desktop | https://kalpadesktop.org/ |
-|Kalpa Documentation | https://kalpadesktop.org/documentation/ |
-|linuxbrew on Kalpa | https://kalpadesktop.org/documentation/brew/ |
-|Citrix Workspace app 2604 for Linux | https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html |
-|Arch Wiki nano | https://wiki.archlinux.org/title/Nano|
-|Plasma Tips | https://userbase.kde.org/Plasma/Tips|
-
+| Kalpa Desktop | https://kalpadesktop.org/ |
+| Kalpa Documentation | https://kalpadesktop.org/documentation/ |
+| linuxbrew on Kalpa | https://kalpadesktop.org/documentation/brew/ |
+| Citrix Workspace app 2604 for Linux | https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html |
+| Arch Wiki nano | https://wiki.archlinux.org/title/Nano |
+| Plasma Tips | https://userbase.kde.org/Plasma/Tips |
 
 ---
 
-**Version:** 1.3 | **Last Updated:** July 4, 2026
+**Version:** 1.4 | **Last Updated:** July 4, 2026
