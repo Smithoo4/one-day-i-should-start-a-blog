@@ -360,6 +360,11 @@ sudo transactional-update -n pkg install ~/Downloads/ICAClient-suse-gcc-8-*.rpm
 sudo systemctl reboot
 ```
 
+Cleanup once completed
+```bash
+rm ~/Downloads/ICAClient-suse-gcc-8-*.rpm
+```
+
 ---
 
 ## 10. Install Linuxbrew
