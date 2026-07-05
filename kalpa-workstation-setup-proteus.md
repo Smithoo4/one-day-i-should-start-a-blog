@@ -353,8 +353,14 @@ source ~/.bashrc
 Citrix Workspace App isn't packaged for openSUSE, so it has to be downloaded and installed manually: no login is required, just go to the [Citrix Workspace App for Linux download page](https://www.citrix.com/downloads/workspace-app/linux/), download the RPM, save it to `~/Downloads/` as `ICAClient-suse-gcc-8-<version>-0.x86_64.rpm`, then install it via `transactional-update` and reboot to activate the snapshot.
 
 ```bash
-sudo transactional-update -n pkg install ~/Downloads/ICAClient-suse-gcc-8-*.rpm
+sudo transactional-update pkg install ~/Downloads/ICAClient-suse-gcc-8-*.rpm
 ```
+
+> [!NOTE]
+> When installing if you encounter the following error:
+> `ICAClient-26.04.0.105-0.x86_64 (Plain RPM files cache): Signature verification failed [6-File is unsigned]`
+> `Abort, retry, ignore? [a/r/i] (a):` 
+> `i` in most cases will resolve it.
 
 ```bash
 sudo systemctl reboot
