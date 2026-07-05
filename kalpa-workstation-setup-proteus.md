@@ -377,22 +377,43 @@ rm ~/Downloads/ICAClient-suse-gcc-8-*.rpm
 
 ### 10a. Install/Setup Linuxbrew
 
-This installs Homebrew and wires it into Konsole shells only, so it doesn't pollute non-interactive or system scripts.
+This installs Homebrew and wires it into the Plasma session, so Konsole and all GUI apps launched from Plasma (Kate, VS Code, etc.) can find brew-installed tools.
+
+Install Homebrew:
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
+
+Load brew into the current shell (for immediate use in this session):
+
 ```bash
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 ```
+
+Create a Plasma session env script so brew is available to Konsole and all Plasma-launched GUI apps:
+
 ```bash
-echo '' >> ~/.bashrc
-echo '# Homebrew: load shellenv only in Konsole sessions' >> ~/.bashrc
-echo 'if [ $(basename $(printf "%s" "$(ps -p $(ps -p $$ -o ppid=) -o cmd=)" | cut --delimiter " " --fields 1)) = konsole ] ; then '$'\n''eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'$'\n''fi'$'\n' >> ~/.bashrc
+mkdir -p ~/.config/plasma-workspace/env
 ```
 ```bash
-source ~/.bashrc
+cat > ~/.config/plasma-workspace/env/homebrew.sh <<'EOF'
+#!/bin/sh
+# Load Homebrew environment for Plasma-launched apps (Konsole, Kate, etc.)
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+# Behavior tweaks
+export HOMEBREW_NO_ANALYTICS=1              # Disable telemetry
+export HOMEBREW_NO_INSECURE_REDIRECT=1      # Fail on insecure download redirects
+export HOMEBREW_NO_ENV_HINTS=1              # Suppress noisy env hint messages
+EOF
 ```
+```bash
+chmod +x ~/.config/plasma-workspace/env/homebrew.sh
+```
+
+> [!NOTE]
+> Log out of Plasma and back in so the env script takes effect for all future sessions.
 
 ### 10b. Setup Auto Updates
 
@@ -447,22 +468,102 @@ brew install yaml-language-server bash-language-server vscode-langservers-extrac
 
 ---
 
-## 11. Configure Kate
+## 15. Configure Kate
 
-**To be done later.**
+### 15a. Enable Useful Plugins
+
+Launch Kate, then **Settings → Configure Kate → Plugins**, and enable:
+
+- **Project Plugin** — fuzzy file open, project tree
+- **Terminal Tool View** — F4 to open a Konsole pane inside Kate
+- **Search & Replace** — project-wide grep
+- **LSP Client** — language server support
+- **Git Blame** — inline blame in the gutter
+- **Document Preview** — live markdown rendering pane (uses `markdownpart` installed in section 12)
+
+<details>
+<summary>Or set it from the terminal</summary>
+
+Kate stores plugin state in the session file (`~/.local/share/kate/anonymous.katesession`), not in `katerc`. The session file is created the first time Kate is launched, so run Kate at least once before applying these changes.
+
+```bash
+SESS=~/.local/share/kate/anonymous.katesession
+
+kwriteconfig6 --file "$SESS" --group "Kate Plugins" --key "kateprojectplugin" true
+kwriteconfig6 --file "$SESS" --group "Kate Plugins" --key "katekonsoleplugin" true
+kwriteconfig6 --file "$SESS" --group "Kate Plugins" --key "katesearchplugin" true
+kwriteconfig6 --file "$SESS" --group "Kate Plugins" --key "lspclientplugin" true
+kwriteconfig6 --file "$SESS" --group "Kate Plugins" --key "kategitblameplugin" true
+kwriteconfig6 --file "$SESS" --group "Kate Plugins" --key "ktexteditorpreviewplugin" true
+```
+
+Restart Kate for the changes to take effect.
+
+</details>
+
+### 15b. Spell Check (Sonnet + Hunspell)
+
+**Settings → Configure Kate → Editor Component → Spellcheck:**
+
+- **Default language:** English (Canada)
+- **Automatic spell checking enabled by default:** enabled
+- **Skip all uppercase words:** enabled
+- **Enable autodetection of language:** disable — it's a known annoyance
+
+<details>
+<summary>Or set it from the terminal</summary>
+
+Spell check settings live in `~/.config/katepartrc` under the `[Spelling]` group.
+
+```bash
+kwriteconfig6 --file katepartrc --group "Spelling" --key "Default Dictionary" "en_CA"
+kwriteconfig6 --file katepartrc --group "Spelling" --key "Default Client" "Hunspell"
+kwriteconfig6 --file katepartrc --group "Spelling" --key "checkerEnabledByDefault" true
+kwriteconfig6 --file katepartrc --group "Spelling" --key "Skip Uppercase" true
+kwriteconfig6 --file katepartrc --group "Spelling" --key "AutodetectLanguage" false
+```
+
+Restart Kate for the changes to take effect.
+
+</details>
 
 ---
 
 ## Reference
 
+## References
+
 | Resource | Link |
 |---|---|
+| **Kalpa Desktop** | |
 | Kalpa Desktop | https://kalpadesktop.org/ |
 | Kalpa Documentation | https://kalpadesktop.org/documentation/ |
-| linuxbrew on Kalpa | https://kalpadesktop.org/documentation/brew/ |
-| Citrix Workspace app 2604 for Linux | https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html |
-| Arch Wiki nano | https://wiki.archlinux.org/title/Nano |
-| Plasma Tips | https://userbase.kde.org/Plasma/Tips |
+| Linuxbrew on Kalpa | https://kalpadesktop.org/documentation/brew/ |
+| **openSUSE / MicroOS** | |
+| openSUSE MicroOS Portal | https://en.opensuse.org/Portal:MicroOS |
+| transactional-update documentation | https://kubic.opensuse.org/documentation/transactional-update-guide/ |
+| **KDE Plasma** | |
+| KDE User Base — Plasma configuration | https://userbase.kde.org/Plasma |
+| KDE User Base — Plasma Tips | https://userbase.kde.org/Plasma/Tips |
+| KDE Developer Docs — Administration | https://develop.kde.org/docs/administration/ |
+| Plasma Digital Clock config (use24hFormat values) | https://phabricator.kde.org/D19230 |
+| **Homebrew** | |
+| Homebrew documentation | https://docs.brew.sh/ |
+| Homebrew Manpage (environment variables) | https://docs.brew.sh/Manpage#environment |
+| Hardening Homebrew configuration | https://www.hesjevik.im/articles/250624-hardening-homebrew/ |
+| **Virtualization** | |
+| openSUSE virtualization guide | https://en.opensuse.org/Portal:Virtualization |
+| **Citrix Workspace** | |
+| Citrix Workspace app for Linux (download) | https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html |
+| Citrix Workspace app for Linux (docs) | https://docs.citrix.com/en-us/citrix-workspace-app-for-linux/ |
+| **OnlyOffice** | |
+| OnlyOffice — Adding fonts | https://helpcenter.onlyoffice.com/docs/installation/docs-community-install-fonts-windows.aspx |
+| OnlyOffice — CJK/Latin font limitation (issue) | https://github.com/ONLYOFFICE/DesktopEditors/issues/2102 |
+| Flatpak fonts / fontconfig override | https://geekgo.tech/linux/flatpak-应用中文字体问题/ |
+| fetchmsttfonts (openSUSE package) |  https://software.opensuse.org/package/fetchmsttfonts |
+| **Editors** | |
+| Arch Wiki — nano | https://wiki.archlinux.org/title/Nano |
+| Micro-Editor | https://github.com/micro-editor/MICRO |
 
 ---
 
