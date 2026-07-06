@@ -468,9 +468,9 @@ brew install yaml-language-server bash-language-server vscode-langservers-extrac
 
 ---
 
-## 15. Configure Kate
+## 11. Configure Kate
 
-### 15a. Enable Useful Plugins
+### 11a. Enable Useful Plugins
 
 Launch Kate, then **Settings → Configure Kate → Plugins**, and enable:
 
@@ -481,51 +481,16 @@ Launch Kate, then **Settings → Configure Kate → Plugins**, and enable:
 - **Git Blame** — inline blame in the gutter
 - **Document Preview** — live markdown rendering pane (uses `markdownpart` installed in section 12)
 
-<details>
-<summary>Or set it from the terminal</summary>
+### 11b. Spell Check (Sonnet + Hunspell)
 
-Kate stores plugin state in the session file (`~/.local/share/kate/anonymous.katesession`), not in `katerc`. The session file is created the first time Kate is launched, so run Kate at least once before applying these changes.
+**Settings → Configure Kate → Editing → Spellcheck:**
 
-```bash
-SESS=~/.local/share/kate/anonymous.katesession
-
-kwriteconfig6 --file "$SESS" --group "Kate Plugins" --key "kateprojectplugin" true
-kwriteconfig6 --file "$SESS" --group "Kate Plugins" --key "katekonsoleplugin" true
-kwriteconfig6 --file "$SESS" --group "Kate Plugins" --key "katesearchplugin" true
-kwriteconfig6 --file "$SESS" --group "Kate Plugins" --key "lspclientplugin" true
-kwriteconfig6 --file "$SESS" --group "Kate Plugins" --key "kategitblameplugin" true
-kwriteconfig6 --file "$SESS" --group "Kate Plugins" --key "ktexteditorpreviewplugin" true
-```
-
-Restart Kate for the changes to take effect.
-
-</details>
-
-### 15b. Spell Check (Sonnet + Hunspell)
-
-**Settings → Configure Kate → Editor Component → Spellcheck:**
-
-- **Default language:** English (Canada)
+- **Default language:** American English (United States)
+- **Preferred Languages:** American English (United States)
+- **Enable autodetection of language:** disable — it's a known annoyance
 - **Automatic spell checking enabled by default:** enabled
 - **Skip all uppercase words:** enabled
-- **Enable autodetection of language:** disable — it's a known annoyance
-
-<details>
-<summary>Or set it from the terminal</summary>
-
-Spell check settings live in `~/.config/katepartrc` under the `[Spelling]` group.
-
-```bash
-kwriteconfig6 --file katepartrc --group "Spelling" --key "Default Dictionary" "en_CA"
-kwriteconfig6 --file katepartrc --group "Spelling" --key "Default Client" "Hunspell"
-kwriteconfig6 --file katepartrc --group "Spelling" --key "checkerEnabledByDefault" true
-kwriteconfig6 --file katepartrc --group "Spelling" --key "Skip Uppercase" true
-kwriteconfig6 --file katepartrc --group "Spelling" --key "AutodetectLanguage" false
-```
-
-Restart Kate for the changes to take effect.
-
-</details>
+- **Skip run-together words:** enabled
 
 ---
 
@@ -567,4 +532,4 @@ Restart Kate for the changes to take effect.
 
 ---
 
-**Version:** 1.4 | **Last Updated:** July 4, 2026
+**Version:** 1.5 | **Last Updated:** July 6, 2026
