@@ -357,16 +357,17 @@ sudo transactional-update pkg install ~/Downloads/ICAClient-suse-gcc-8-*.rpm
 ```
 
 > [!NOTE]
-> When installing if you encounter the following error:
+> When installing the RPM, if you encounter the following error:
 > `ICAClient-26.04.0.105-0.x86_64 (Plain RPM files cache): Signature verification failed [6-File is unsigned]`
-> `Abort, retry, ignore? [a/r/i] (a):` 
+> `Abort, retry, ignore? [a/r/i] (a):`
 > `i` in most cases will resolve it.
 
 ```bash
 sudo systemctl reboot
 ```
 
-Cleanup once completed
+Clean up once completed:
+
 ```bash
 rm ~/Downloads/ICAClient-suse-gcc-8-*.rpm
 ```
@@ -475,11 +476,9 @@ brew install yaml-language-server bash-language-server vscode-langservers-extrac
 Launch Kate, then **Settings → Configure Kate → Plugins**, and enable:
 
 - **Project Plugin** — fuzzy file open, project tree
-- **Terminal Tool View** — F4 to open a Konsole pane inside Kate
-- **Search & Replace** — project-wide grep
 - **LSP Client** — language server support
 - **Git Blame** — inline blame in the gutter
-- **Document Preview** — live markdown rendering pane (uses `markdownpart` installed in section 12)
+- **Document Preview** — live markdown rendering pane
 
 ### 11b. Spell Check (Sonnet + Hunspell)
 
@@ -494,13 +493,11 @@ Launch Kate, then **Settings → Configure Kate → Plugins**, and enable:
 
 ---
 
-## Reference
-
 ## References
 
 | Resource | Link |
 |---|---|
-| **Kalpa Desktop** | |
+| **Kalpa** | |
 | Kalpa Desktop | https://kalpadesktop.org/ |
 | Kalpa Documentation | https://kalpadesktop.org/documentation/ |
 | Linuxbrew on Kalpa | https://kalpadesktop.org/documentation/brew/ |
@@ -525,7 +522,7 @@ Launch Kate, then **Settings → Configure Kate → Plugins**, and enable:
 | OnlyOffice — Adding fonts | https://helpcenter.onlyoffice.com/docs/installation/docs-community-install-fonts-windows.aspx |
 | OnlyOffice — CJK/Latin font limitation (issue) | https://github.com/ONLYOFFICE/DesktopEditors/issues/2102 |
 | Flatpak fonts / fontconfig override | https://geekgo.tech/linux/flatpak-应用中文字体问题/ |
-| fetchmsttfonts (openSUSE package) |  https://software.opensuse.org/package/fetchmsttfonts |
+| fetchmsttfonts (openSUSE package) | https://software.opensuse.org/package/fetchmsttfonts |
 | **Editors** | |
 | Arch Wiki — nano | https://wiki.archlinux.org/title/Nano |
 | Micro-Editor | https://github.com/micro-editor/MICRO |
