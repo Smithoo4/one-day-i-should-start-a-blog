@@ -149,29 +149,20 @@ Create `/home/morgan/.config/home-manager/flake.nix` with the following content:
 Create `/home/morgan/.config/home-manager/home.nix`:
 
 ```
-{ config, pkgs, ... }:
-
+{ pkgs, ... }:
 {
-  # ---------------------------------------------------------------------------
-  # Basic User and Environment Configuration
-  # ---------------------------------------------------------------------------
   home.username = "morgan";
   home.homeDirectory = "/home/morgan";
-  home.stateVersion = "26.05"; 
+  home.stateVersion = "26.05";
+
   programs.home-manager.enable = true;
 
-  # ---------------------------------------------------------------------------
-  # Automatic Garbage Collection of User Nix Profiles
-  # ---------------------------------------------------------------------------
   nix.gc = {
     automatic = true;
     dates = "weekly";
     options = "--delete-older-than 30d";
   };
 
-  # ---------------------------------------------------------------------------
-  # Automatic Update of Flake Inputs and Installed Packages
-  # ---------------------------------------------------------------------------
   systemd.user.services.home-manager-auto-update = {
     Unit.Description = "Auto-update Home Manager flake inputs and apply changes";
     Service = {
@@ -197,9 +188,6 @@ Create `/home/morgan/.config/home-manager/home.nix`:
     Install.WantedBy = [ "timers.target" ];
   };
 
-  # ---------------------------------------------------------------------------
-  # Software Packages to Install
-  # ---------------------------------------------------------------------------
   home.packages = with pkgs; [
     sops
     age
@@ -208,11 +196,9 @@ Create `/home/morgan/.config/home-manager/home.nix`:
     bash-language-server
     vscode-langservers-extracted
     marksman
+    nil
   ];
 
-  # ---------------------------------------------------------------------------
-  # Git Configuration
-  # ---------------------------------------------------------------------------
   programs.git = {
     enable = true;
     settings = {
@@ -224,23 +210,26 @@ Create `/home/morgan/.config/home-manager/home.nix`:
     };
   };
 
-  # ---------------------------------------------------------------------------
-  # Bash Configuration
-  # ---------------------------------------------------------------------------
+  home.sessionVariables = {
+    EDITOR = "nano";
+    VISUAL = "nano";
+  };
+
   programs.bash = {
     enable = true;
     initExtra = ''
-      # Full repo dump (respects .gitignore, excludes LICENSE and repo_dump.txt)
+      # Full repo dump. Respects .gitignore and excludes LICENSE and repo_dump.txt.
       repodump() {
-          git ls-files \
-              | grep -vE '^(LICENSE|repo_dump\.txt)$' \
-              | sort \
-              | while read -r f; do
-                  echo "===== $f ====="
-                  cat "$f"
-                  echo ""
-              done > repo_dump.txt \
-              && echo "[OK] repo_dump.txt created"
+        git ls-files \
+          | sort \
+          | while read -r f; do
+              [[ "$f" == "repo_dump.txt" || "$f" == "LICENSE" ]] && continue
+              [[ -f "$f" ]] || continue
+              echo "===== $f ====="
+              cat "$f"
+              echo ""
+            done > repo_dump.txt \
+          && echo "[OK] repo_dump.txt created"
       }
     '';
   };
